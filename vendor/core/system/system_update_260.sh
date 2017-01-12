@@ -15,7 +15,7 @@ function system_add_docker_compose_in_home_bash() {
 
   if ! grep -wq "COMPOSE_FILE" ${_RC_FILE} ; then
 
-    local _DOCKER_COMPOSER="${SF_SCRIPTS_HOME}/config/docker-compose.yml"
+    local _DOCKER_COMPOSER="${_SCRIPT_HOME}/config/docker-compose.yml"
     echo "export COMPOSE_FILE=${_DOCKER_COMPOSER}" >> ${_RC_FILE}
 
   fi

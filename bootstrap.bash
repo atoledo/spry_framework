@@ -33,14 +33,14 @@ function bootstrap_exit() {
 
 function bootstrap_core() {
 
-  local _LOAD_FILES=$(find "${SF_SCRIPTS_HOME}/vendor/core" -type f -iname "*.sh" -o -iname "*.bash");
+  local _LOAD_FILES=$(find "${_SCRIPT_HOME}/vendor/core" -type f -iname "*.sh" -o -iname "*.bash");
   bootstrap_autoload ${_LOAD_FILES}
 
 }
 
 function bootstrap_load_tasks() {
 
-  local _LOAD_FILES=$(find "${SF_SCRIPTS_HOME}/tasks" -type f -iname "${_TASK_NAME}.sh");
+  local _LOAD_FILES=$(find "${_SCRIPT_HOME}/tasks" -type f -iname "${_TASK_NAME}.sh");
   if [[ -z "${_LOAD_FILES}" ]]; then
 
     raise FolderNotKnown "[bootstrap_load_tasks] Folder '${_TASK_NAME}' is unknown"
@@ -48,7 +48,7 @@ function bootstrap_load_tasks() {
   fi
 
   local _LOAD_TASK_PARENT_DIR="$(dirname  ${_LOAD_FILES})"
-  local _LOAD_TASK_DIR="${SF_SCRIPTS_HOME}/tasks/${_TASK_PARENT_NAME}"
+  local _LOAD_TASK_DIR="${_SCRIPT_HOME}/tasks/${_TASK_PARENT_NAME}"
   export _TASK_PARENT_NAME="$(basename ${_LOAD_TASK_PARENT_DIR})"
   if [ -d ${_LOAD_TASK_DIR} ]; then
 
@@ -63,8 +63,8 @@ function bootstrap_load_tasks() {
 
 function bootstrap_load_modules() {
 
-  local _VENDOR_FOLDER="${SF_SCRIPTS_HOME}/vendor"
-  local _FOLDER_MODULES_LOCAL="${SF_SCRIPTS_HOME}/modules"
+  local _VENDOR_FOLDER="${_SCRIPT_HOME}/vendor"
+  local _FOLDER_MODULES_LOCAL="${_SCRIPT_HOME}/modules"
 
   while [[ ! -z "${_MODULE_DEPENDENCIES:-}" && -n "${_MODULE_DEPENDENCIES[@]}" && "${#_MODULE_DEPENDENCIES[@]}" -ge 1 && -n "${#_LOADED_MODULE_DEPENDENCIES[@]}" ]]; do
 
@@ -99,7 +99,7 @@ function bootstrap_load_modules() {
 
     done
 
-    local _LOAD_FILES=$(find ${_FOLDERS[@]} -not \( -path "${SF_SCRIPTS_HOME}/vendor/core" -prune \) -type f -iname "*.bash");
+    local _LOAD_FILES=$(find ${_FOLDERS[@]} -not \( -path "${_SCRIPT_HOME}/vendor/core" -prune \) -type f -iname "*.bash");
     local _LOADED_MODULE_DEPENDENCIES_BATCH=(${_MODULE_DEPENDENCIES[@]})
 
     bootstrap_autoload ${_LOAD_FILES}
@@ -114,13 +114,13 @@ function bootstrap_load_modules() {
   # Load config variables from dependencies
   for _MODULE in ${_LOADED_MODULE_DEPENDENCIES[@]}; do
 
-      local _CONFIG_PATH="${SF_SCRIPTS_HOME}/config/${_MODULE}_config.bash"
+      local _CONFIG_PATH="${_SCRIPT_HOME}/config/${_MODULE}_config.bash"
       bootstrap_autoload ${_CONFIG_PATH}
 
   done
 
   # Load config variables from running task
-  local _TASK_CONFIG_PATH="${SF_SCRIPTS_HOME}/config/${_TASK_PARENT_NAME}_config.bash"
+  local _TASK_CONFIG_PATH="${_SCRIPT_HOME}/config/${_TASK_PARENT_NAME}_config.bash"
   bootstrap_autoload ${_TASK_CONFIG_PATH}
 
 }

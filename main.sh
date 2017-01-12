@@ -19,16 +19,16 @@ fi
 
 # Setup this variable in jenkins providing the path to the scripts. It may be
 # a workspace of another job
-if [ -z "${SF_SCRIPTS_HOME:-}" ]; then
+if [ -z "${_SCRIPT_HOME:-}" ]; then
 
   if [ -d "${HOME}/projects/canvas_ops" ]; then
 
-    SF_SCRIPTS_HOME="${HOME}/projects/canvas_ops"
+    _SCRIPT_HOME="${HOME}/projects/canvas_ops"
 
   else
 
     echo -e "\033[1;91m[ ✘ ] The program was aborted due to an error:\n"
-    echo -e "\tEXCEPTION NoTaskSpecified: SF_SCRIPTS_HOME variable not set and default path is not valid (${HOME}/projects/canvas_ops)\033[0m"
+    echo -e "\tEXCEPTION NoTaskSpecified: _SCRIPT_HOME variable not set and default path is not valid (${HOME}/projects/canvas_ops)\033[0m"
     exit 100
 
   fi
@@ -37,8 +37,8 @@ fi
 
 if [ ${#} -ge 1 ]; then
 
-  source "${SF_SCRIPTS_HOME}/bootstrap.bash"
-  readonly _SF_SCRIPTS_CONFIG="${SF_SCRIPTS_HOME}/config"
+  source "${_SCRIPT_HOME}/bootstrap.bash"
+  readonly _SF_SCRIPTS_CONFIG="${_SCRIPT_HOME}/config"
   readonly _TASK_NAME=${1}
   export _TASK_PARENT_NAME=""
   bootstrap_core
