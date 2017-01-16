@@ -33,14 +33,14 @@ function bootstrap_exit() {
 
 function bootstrap_core() {
 
-  local _LOAD_FILES=$(find "${_SCRIPT_HOME}/vendor/core" -type f -iname "*.sh" -o -iname "*.bash");
+  local _LOAD_FILES=$(find "${_SPRY_SCRIPT_HOME}/vendor/core" -type f -iname "*.sh" -o -iname "*.bash");
   bootstrap_autoload ${_LOAD_FILES}
 
 }
 
 function bootstrap_load_tasks() {
 
-  local _LOAD_FILES=$(find "${_SCRIPT_HOME}/tasks" -type f -iname "${_TASK_NAME}.sh");
+  local _LOAD_FILES=$(find "${_TASKS_FOLDER_PATH}" -type f -iname "${_TASK_NAME}.sh");
   if [[ -z "${_LOAD_FILES}" ]]; then
 
     raise FolderNotKnown "[bootstrap_load_tasks] Folder '${_TASK_NAME}' is unknown"
@@ -48,7 +48,7 @@ function bootstrap_load_tasks() {
   fi
 
   local _LOAD_TASK_PARENT_DIR="$(dirname  ${_LOAD_FILES})"
-  local _LOAD_TASK_DIR="${_SCRIPT_HOME}/tasks/${_TASK_PARENT_NAME}"
+  local _LOAD_TASK_DIR="${_TASKS_FOLDER_PATH}/${_TASK_PARENT_NAME}"
   export _TASK_PARENT_NAME="$(basename ${_LOAD_TASK_PARENT_DIR})"
   if [ -d ${_LOAD_TASK_DIR} ]; then
 
@@ -63,43 +63,40 @@ function bootstrap_load_tasks() {
 
 function bootstrap_load_modules() {
 
-  local _VENDOR_FOLDER="${_SCRIPT_HOME}/vendor"
-  local _FOLDER_MODULES_LOCAL="${_SCRIPT_HOME}/modules"
-
   while [[ ! -z "${_MODULE_DEPENDENCIES:-}" && -n "${_MODULE_DEPENDENCIES[@]}" && "${#_MODULE_DEPENDENCIES[@]}" -ge 1 && -n "${#_LOADED_MODULE_DEPENDENCIES[@]}" ]]; do
 
     local _FOLDERS=("")
     for _FOLDER in ${_MODULE_DEPENDENCIES[@]}; do
 
-      local _ERRORS_FOUND=false
+      local _ERRORS_FOUND="false"
 
-      if [ -d "${_VENDOR_FOLDER}/${_FOLDER}" ]; then
+      if [ -d "${_VENDOR_FOLDER_PATH}/${_FOLDER}" ]; then
 
-        _FOLDERS=(${_FOLDERS[@]} "${_VENDOR_FOLDER}/${_FOLDER}")
+        _FOLDERS=(${_FOLDERS[@]} "${_VENDOR_FOLDER_PATH}/${_FOLDER}")
 
       else
 
-          if [ -d "${_FOLDER_MODULES_LOCAL}/${_FOLDER}" ]; then
+        if [ -d "${_MODULES_FOLDER_PATH}/${_FOLDER}" ]; then
 
-            _FOLDERS=(${_FOLDERS[@]} "${_FOLDER_MODULES_LOCAL}/${_FOLDER}")
+          _FOLDERS=(${_FOLDERS[@]} "${_MODULES_FOLDER_PATH}/${_FOLDER}")
 
-          else
+        else
 
-            _ERRORS_FOUND=true
+          _ERRORS_FOUND=true
 
-          fi
+        fi
 
-          if [ ${_ERRORS_FOUND} == true ];then
+        if [ ${_ERRORS_FOUND} == true ];then
 
-              raise FolderNotKnown "[bootstrap_load_modules] Folder '${_FOLDER_MODULES_LOCAL}/${_FOLDER}' is unknown"
+          raise FolderNotKnown "[bootstrap_load_modules] Folder '${_MODULES_FOLDER_PATH}/${_FOLDER}' is unknown"
 
-          fi
+        fi
 
       fi
 
     done
 
-    local _LOAD_FILES=$(find ${_FOLDERS[@]} -not \( -path "${_SCRIPT_HOME}/vendor/core" -prune \) -type f -iname "*.bash");
+    local _LOAD_FILES=$(find ${_FOLDERS[@]} -not \( -path "${_CORE_FOLDER_PATH}" -prune \) -type f -iname "*.bash");
     local _LOADED_MODULE_DEPENDENCIES_BATCH=(${_MODULE_DEPENDENCIES[@]})
 
     bootstrap_autoload ${_LOAD_FILES}
@@ -114,13 +111,13 @@ function bootstrap_load_modules() {
   # Load config variables from dependencies
   for _MODULE in ${_LOADED_MODULE_DEPENDENCIES[@]}; do
 
-      local _CONFIG_PATH="${_SCRIPT_HOME}/config/${_MODULE}_config.bash"
-      bootstrap_autoload ${_CONFIG_PATH}
+    local _CONFIG_PATH="${_CONFIG_FOLDER_PATH}/${_MODULE}_config.bash"
+    bootstrap_autoload ${_CONFIG_PATH}
 
   done
 
   # Load config variables from running task
-  local _TASK_CONFIG_PATH="${_SCRIPT_HOME}/config/${_TASK_PARENT_NAME}_config.bash"
+  local _TASK_CONFIG_PATH="${_CONFIG_FOLDER_PATH}/${_TASK_PARENT_NAME}_config.bash"
   bootstrap_autoload ${_TASK_CONFIG_PATH}
 
 }
@@ -153,8 +150,33 @@ function bootstrap_update_loaded_files() {
 
 function bootstrap_update() {
 
-  system_check_update
-  system_check_dependencies_not_installed
+  local _SYSTEM_DEPENDENCIES=""
+
+  update_analyze_dependencies ${_TASK_NAME} "${_LOADED_MODULE_DEPENDENCIES[@]}"
+
+}
+
+function bootstrap_load_components() {
+
+  local _BOOSTRAP_LOAD_COMPONENTS=${@}
+  local _COMPONENT=""
+
+  for _COMPONENT in ${_BOOSTRAP_LOAD_COMPONENTS[@]}; do
+
+    local _COMPONENT_PATH="$(update_get_component_path ${_COMPONENT})"
+    local _COMPONENT_FROM_SRC=$(find ${_COMPONENT_PATH} -regex ".*.dependencies.bash")
+    bootstrap_autoload ${_COMPONENT_FROM_SRC}
+
+  done
+
+}
+
+function bootstrap_installer_dependencies() {
+
+  local _SYSTEM_DEPENDENCIES=""
+  local _MODULE_DEPENDENCIES=$(egrep -ir "_dependencies_[0-9]{1,4}" ${_SPRY_SCRIPT_HOME}/tasks/ -o ${_SPRY_SCRIPT_HOME}/modules/ -o ${_SPRY_SCRIPT_HOME}/vendor/ | grep -o "[a-zA-Z_]*.dependencies.bash" |sed -e "s#.dependencies.bash##g" | sort -u | sed -e "s#\n# ##g")
+  bootstrap_load_components ${_MODULE_DEPENDENCIES[@]}
+  update_analyze_dependencies ${_MODULE_DEPENDENCIES[@]}
 
 }
 

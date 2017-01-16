@@ -7,7 +7,7 @@ Initialize framework with the command below. It will add to your .bashrc the scr
   ./sfinit.sh
 
 The auto completion will display the available tasks for execution. Each task has it's own usage:
-  sf <task> <params>
+  ${_SPRY_FRAMEWORK_PROJECT_ALIAS} <task> <params>
 
 ### Core modules
 The framework core already provides methods for integrating with:
@@ -30,7 +30,7 @@ Your custom tasks should be created in the `tasks` folder. It is mandatory that 
 ```
 function foobar_usage() {
   if [ ! ${#} -eq 2 ]; then
-    out_usage "sf foobar <param 1> <param 2> (<optional param 3>)" 1
+    out_usage "${_SPRY_FRAMEWORK_PROJECT_ALIAS} foobar <param 1> <param 2> (<optional param 3>)" 1
     return 1
   else
     return 0
@@ -90,8 +90,8 @@ Just like Drupal hooks, you may create custom hooks or use the built-in availabl
 
 ### Validator
 A validator examines its input with respect to some requirements and produces a boolean result - whether the input successfully validates against the requirements. If the input does not meet the requirements, a validator may additionally provide information about which requirement(s) the input does not meet.
-Validator path: **${_SCRIPT_HOME}/vendor/core/validates**
+Validator path: **${_SPRY_SCRIPT_HOME}/vendor/core/validates**
 
 ### Filters
 In the physical world, a filter is typically used for removing unwanted portions of input, and the desired portion of the input passes through as filter output (e.g., coffee). In such scenarios, a filter is an operator that produces a subset of the input. This type of filtering is useful for  applications - removing illegal input, trimming unnecessary white space, etc.
-Filter path: **${_SCRIPT_HOME}/vendor/core/filter**
+Filter path: **${_SPRY_SCRIPT_HOME}/vendor/core/filter**

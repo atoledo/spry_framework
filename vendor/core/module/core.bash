@@ -276,32 +276,68 @@ function program_is_installed() {
 
 }
 
+function check_software_repo() {
+
+  local _SOFTWARE=${1}
+  local _RETURN=1
+
+  if (is_linux); then
+
+    apt-cache search "^${_SOFTWARE}$" | grep -q ${_SOFTWARE}
+    if [ $? -eq 0 ]; then
+
+      _RETURN=0
+
+    fi
+
+  elif (is_mac); then
+
+    brew -S ${_SOFTWARE} | grep -Ewoq "${_SOFTWARE}"
+    if [ $? -eq 0 ]; then
+
+      _RETURN=0
+
+    fi
+
+  fi
+
+  echo ${_RETURN}
+
+}
+
 # Install a new software
 # example
 # install_software sshpass"
 function install_software() {
 
-  # set to 0 if not found
-  local _softwares_not_installed=""
-  for s in "${@}"; do
+  local _SOFTWARE_LIST="${@}"
 
-    if [ $(program_is_installed ${s}) == 1 ]; then
+  if [ -n "${_SOFTWARE_LIST}" ]; then
 
-      _softwares_not_installed="${s} ${_softwares_not_installed}"
+    # set to 0 if not found
+    local _SOFTWARES_NOT_INSTALLED=""
+    local _SOFTWARE=""
+    for _SOFTWARE in "${@}"; do
+
+      if [ $(program_is_installed ${_SOFTWARE}) == 1 ] && [[ $(check_software_repo ${_SOFTWARE}) == 0 ]]; then
+
+        _SOFTWARES_NOT_INSTALLED="${_SOFTWARE} ${_SOFTWARES_NOT_INSTALLED}"
+
+      fi
+
+    done
+
+    if (is_linux); then
+
+      sudo apt-get -y --no-install-recommends install ${_SOFTWARES_NOT_INSTALLED}
+      return $?
+
+    elif (is_mac); then
+
+      brew install ${_SOFTWARES_NOT_INSTALLED}
+      return $?
 
     fi
-
-  done
-
-  if (is_linux); then
-
-    sudo apt-get -y --no-install-recommends install ${_softwares_not_installed}
-    return $?
-
-  elif (is_mac); then
-
-    brew install ${_softwares_not_installed}
-    return $?
 
   fi
 

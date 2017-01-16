@@ -2,7 +2,7 @@
 
 function demo_load_configurations {
 
-  out_warning "Loading parameters configurations"
+  out_warning "Loading parameters configurations" 1
 
   _DEMO_PARAM=${1:-}
   validate_is_empty ${_DEMO_PARAM} "<parameter_name>" "demo_load_configurations"
@@ -14,7 +14,7 @@ function demo_load_configurations {
 
 function demo_execute {
 
-  out_warning "Starting execution"
+  out_warning "Starting execution" 1
 
   if [ ${_DEMO_SUCCESS} == "true" ]; then
 

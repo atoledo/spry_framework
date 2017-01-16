@@ -32,9 +32,9 @@ grep -Fxwq "#SF_INIT_SCRIPT" ${_RC_FILE}
 if [ $? -ge 1 ]; then
 
   echo -e "\n#SF_INIT_SCRIPT
-export _SCRIPT_HOME=${_CURRENT_DIR}
+export _SPRY_SCRIPT_HOME=${_CURRENT_DIR}
 export COMPOSE_FILE=${_DOCKER_COMPOSER}
-[ -f \${_SCRIPT_HOME}/.sfrc ] && source \${_SCRIPT_HOME}/.sfrc" >> ${_RC_FILE}
+[ -f \${_SPRY_SCRIPT_HOME}/.sfrc ] && source \${_SPRY_SCRIPT_HOME}/.sfrc" >> ${_RC_FILE}
 
   echo -e "\nInstallation complete. Please reload the terminal"
 

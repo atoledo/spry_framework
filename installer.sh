@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#TODO All sudo actions must be performed during script install/setup
+# TODO All sudo actions must be performed during script install/setup
 
 ## BASH GLOBAL CONFIGURATION
 [ -z "${_DEBUG}" ] && _DEBUG=false
@@ -27,24 +27,10 @@ if [ -z "${_SPRY_SCRIPT_HOME:-}" ]; then
 
 fi
 
-if [ ${#} -ge 1 ]; then
+[ -f "${_SPRY_SCRIPT_HOME}/.env" ] && source "${_SPRY_SCRIPT_HOME}/.env"
+source "${_SPRY_SCRIPT_HOME}/bootstrap.bash"
+readonly _SF_SCRIPTS_CONFIG="${_SPRY_SCRIPT_HOME}/config"
+readonly _TASK_NAME="installer"
 
-  [ -f "${_SPRY_SCRIPT_HOME}/.env" ] && source "${_SPRY_SCRIPT_HOME}/.env"
-  source "${_SPRY_SCRIPT_HOME}/bootstrap.bash"
-  readonly _SF_SCRIPTS_CONFIG="${_SPRY_SCRIPT_HOME}/config"
-  readonly _TASK_NAME=${1}
-  export _TASK_PARENT_NAME=""
-  bootstrap_core
-  bootstrap_load_tasks
-  bootstrap_load_modules
-  bootstrap_update
-  bootstrap_run "$@"
-  bootstrap_exit
-
-else
-
-  echo -e "\033[1;91m[ ✘ ] The program was aborted due to an error:\n"
-  echo -e "\tEXCEPTION NoTaskSpecified: No task was specified to be executed\033[0m"
-  exit 100
-
-fi
+bootstrap_core
+bootstrap_installer_dependencies

@@ -114,21 +114,21 @@ function out_notify() {
 
   elif [ -n "${_NOTIFY}" ]; then
 
-    if [ "${_TYPE}" == "2" ] && [ -f "${_SCRIPT_HOME}/vendor/core/images/warning.png" ]; then
+    if [ "${_TYPE}" == "2" ] && [ -f "${_SPRY_SCRIPT_HOME}/vendor/core/images/warning.png" ]; then
 
-      ${_NOTIFY} -i ${_SCRIPT_HOME}/vendor/core/images/warning.png "${_TITLE}" "${_MESSAGE}"
+      ${_NOTIFY} -i ${_SPRY_SCRIPT_HOME}/vendor/core/images/warning.png "${_TITLE}" "${_MESSAGE}"
 
-    elif [ "${_TYPE}" == "3" ] && [ -f "${_SCRIPT_HOME}/vendor/core/images/danger.png" ]; then
+    elif [ "${_TYPE}" == "3" ] && [ -f "${_SPRY_SCRIPT_HOME}/vendor/core/images/danger.png" ]; then
 
-      ${_NOTIFY} -i ${_SCRIPT_HOME}/vendor/core/images/danger.png "${_TITLE}" "${_MESSAGE}"
+      ${_NOTIFY} -i ${_SPRY_SCRIPT_HOME}/vendor/core/images/danger.png "${_TITLE}" "${_MESSAGE}"
 
-    elif [ "${_TYPE}" == "4" ] && [ -f "${_SCRIPT_HOME}/vendor/core/images/angry.png" ]; then
+    elif [ "${_TYPE}" == "4" ] && [ -f "${_SPRY_SCRIPT_HOME}/vendor/core/images/angry.png" ]; then
 
-      ${_NOTIFY} -i ${_SCRIPT_HOME}/vendor/core/images/angry.png "${_TITLE}" "${_MESSAGE}"
+      ${_NOTIFY} -i ${_SPRY_SCRIPT_HOME}/vendor/core/images/angry.png "${_TITLE}" "${_MESSAGE}"
 
-    elif [ -f "${_SCRIPT_HOME}/vendor/core/images/success.png" ]; then
+    elif [ -f "${_SPRY_SCRIPT_HOME}/vendor/core/images/success.png" ]; then
 
-      ${_NOTIFY} -i ${_SCRIPT_HOME}/vendor/core/images/success.png "${_TITLE}" "${_MESSAGE}"
+      ${_NOTIFY} -i ${_SPRY_SCRIPT_HOME}/vendor/core/images/success.png "${_TITLE}" "${_MESSAGE}"
 
     fi
 
