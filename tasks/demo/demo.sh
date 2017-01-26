@@ -14,7 +14,7 @@ function demo_usage() {
 
   if [ ${#} -lt 1 ] || [ ${#} -gt 2 ]; then
 
-    out_usage "${_SPRY_SCRIPT_ALIAS} demo <param> (<success:true>)" 1
+    out_usage "${_SPRY_FRAMEWORK_PROJECT_ALIAS} demo <param> (<success:true>)" 1
     return 1
 
   else
