@@ -9,6 +9,8 @@ function acquia_subsite_mysqldump_no_cache() {
   local _SUB_SITE=${3:-}
   local _DOWNLOADED_DB_FILE=${4:-}
 
+  filesystem_create_folder ${_DOWNLOADED_DB_FILE}
+
   local _SITE_PATH="/var/www/html/${_SUBSCRIPTION}.${_ENVIRONMENT}/docroot/sites/${_SUB_SITE}"
 
   ${_DRUSH} @${_SUBSCRIPTION}.${_ENVIRONMENT} ssh "cd ${_SITE_PATH} \

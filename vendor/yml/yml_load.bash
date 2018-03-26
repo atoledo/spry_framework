@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function yml_loader() {
+function yml() {
 
   if [ -z "${1:-}" ]; then
 
@@ -8,11 +8,11 @@ function yml_loader() {
 
   else
 
-    local _YML_LOADER_FILE=${1}
+    local _yml_FILE=${1}
 
   fi
 
-  local _YML_LOADER_PREFIX=${2^^:-}
+  local _yml_PREFIX=${2^^:-}
 
   local s
   local w
@@ -21,14 +21,14 @@ function yml_loader() {
   w='[a-zA-Z0-9_]*'
   fs="$(echo @|tr @ '\034')"
   sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
-      -e "s|^\($s\)\($w\)$s[:-]$s\(.*\)$s\$|\1$fs\2$fs\3|p" "${_YML_LOADER_FILE}" |
+      -e "s|^\($s\)\($w\)$s[:-]$s\(.*\)$s\$|\1$fs\2$fs\3|p" "${_yml_FILE}" |
   awk -F"$fs" '{
   indent = length($1)/2;
   vname[indent] = $2;
   for (i in vname) {if (i > indent) {delete vname[i]}}
       if (length($3) > 0) {
           vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-          printf("%s%s%s=(\"%s\")\n", "'"${_YML_LOADER_PREFIX}"'",toupper(vn), toupper($2), $3);
+          printf("%s%s%s=(\"%s\")\n", "'"${_yml_PREFIX}"'",toupper(vn), toupper($2), $3);
         }
   }' | sed 's/_=/+=/g'
 
@@ -57,7 +57,7 @@ yay_parse() {
   awk -F$fs '{
     indent       = length($1)/2;
     key          = toupper($2);
-    value        = toupper($3);
+    value        = $3;
 
     # No prefix or parent for the top level (indent zero)
     root_prefix  = "'$prefix'_";
@@ -90,4 +90,4 @@ yay() { eval $(yay_parse "$@"); }
 
 
 # helper to load yml_parse data file
-yml_parse() { eval $(yml_loader "$@"); }
+yml_parse() { eval $(yml "$@"); }
