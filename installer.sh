@@ -34,3 +34,4 @@ readonly _TASK_NAME="installer"
 
 bootstrap_core
 bootstrap_installer_dependencies
+bootstrap_create_configuration_files

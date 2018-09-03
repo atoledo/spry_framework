@@ -97,7 +97,7 @@ function update_get_code_version() {
 
   if [[ -d ${_UPDATE_PROCESS_PATH} ]] && [[ -f "${_UPDATE_PROCESS_PATH}/${_UPDATE_DEPENDENCY}.dependencies.bash" ]]; then
 
-    _UPDATE_DEPENDENCY_VERSIONS=$(egrep -o "^[a-z ]*_dependencies_[0-9]*" "${_UPDATE_PROCESS_PATH}/${_UPDATE_DEPENDENCY}.dependencies.bash")
+    _UPDATE_DEPENDENCY_VERSIONS=$(egrep -o "^[a-z_ ]*_dependencies_[0-9]*" "${_UPDATE_PROCESS_PATH}/${_UPDATE_DEPENDENCY}.dependencies.bash")
 
     if [ -n "${_UPDATE_DEPENDENCY_VERSIONS}" ]; then
 
@@ -153,7 +153,7 @@ function update_dependency() {
   fi
 
   # Get versions from source code
-  local _UPDATE_DEPENDENCIES_FUNCTIONS=$(egrep -o "^[a-z ]*_dependencies_[0-9]*" "${_UPDATE_PROCESS_PATH}/${_UPDATE_DEPENDENCY}.dependencies.bash")
+  local _UPDATE_DEPENDENCIES_FUNCTIONS=$(egrep -o "^[a-z_ ]*_dependencies_[0-9]*" "${_UPDATE_PROCESS_PATH}/${_UPDATE_DEPENDENCY}.dependencies.bash")
   local _UPDATE_DEPENDENCIES_VERSIONS=$(echo "${_UPDATE_DEPENDENCIES_FUNCTIONS}" | rev | cut -d "_" -f1 | rev)
   local _UPDATES=$(echo "${_UPDATE_DEPENDENCIES_VERSIONS}" | awk '$0 > '${_UPDATE_DEPENDENCY_CUR_VERSION}' {print ;}')
   local _UPDATE=""
