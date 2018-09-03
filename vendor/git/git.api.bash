@@ -190,10 +190,11 @@ function git_reset_repository() {
   fi
 
   out_info "Reseting repository [ ${_GIT_REPO_PATH} ]" 1
-  local _GIT_ACTIVE_RESOURCE="$(${_GIT} -C ${_GIT_REPO_PATH} symbolic-ref -q --short HEAD || ${_GIT} -C ${_GIT_REPO_PATH} describe --tags --exact-match)"
+  local _GIT_ACTIVE_RESOURCE="$(git_get_current_resource ${_GIT_REPO_PATH})"
+
   if [ ! -z ${_GIT_ACTIVE_RESOURCE} ]; then
 
-    if ${_GIT} -C ${_GIT_REPO_PATH} show-ref --tags | ${_GREP} -q  ${_GIT_ACTIVE_RESOURCE}; then
+    if (git_is_tag ${_GIT_REPO_PATH} ${_GIT_ACTIVE_RESOURCE}); then
 
       ${_GIT} -C ${_GIT_REPO_PATH} reset --hard ${_GIT_ACTIVE_RESOURCE}
       out_check_status $? "Reseting tag with success" "Fail on reset tag ${_GIT_ACTIVE_RESOURCE}"

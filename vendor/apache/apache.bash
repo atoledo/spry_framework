@@ -5,11 +5,11 @@ import drush
 
 function apache_prepare() {
 
-    if [ -z ${_APACHE_SITES_AVAILABLE:-} ]; then
+  if [ -z ${_APACHE_SITES_AVAILABLE:-} ]; then
 
-      raise MissingRequiredConfig "Please configure variable _APACHE_SITES_AVAILABLE for integrating whith Apache2"
+    raise MissingRequiredConfig "Please configure variable _APACHE_SITES_AVAILABLE for integrating whith Apache2"
 
-    fi
+  fi
 
 }
 
@@ -111,8 +111,6 @@ function apache_generate_vhost_macro() {
   local _APACHE_SUBSCRIPTION_PATH=$(dirname ${_APACHE_MACRO_VHOST_FILE:-})
   local _DOMAIN_LIST=${@}
 
-  apache_prepare
-
   if [ ! -f "${_APACHE_MACRO_VHOST_FILE}" ]; then
 
     out_info "Creating virtual hosts file" 1
@@ -162,7 +160,7 @@ function apache_restart() {
 
   out_info "Restarting Apache2" 1
   sleep 5;
-  ${_SERVICE} apache2 restart
+  ${_SUDO} ${_SERVICE} apache2 restart
   out_check_status $? "Apache2 restarted successfully" "Error on reload Apache2"
 
 }

@@ -99,6 +99,7 @@ function git_is_tag() {
 
   local _GIT_REPO_PATH=${1:-}
   local _GIT_RESOURCE=${2:-}
+  local _TAG_FOUND=""
 
   if [ ! -d ${_GIT_REPO_PATH} ]; then
 
@@ -106,7 +107,9 @@ function git_is_tag() {
 
   fi
 
-  if ${_GIT} -C ${_GIT_REPO_PATH} show-ref --tags | ${_GREP} -q  ${_GIT_RESOURCE}; then
+  _TAG_FOUND=$(${_GIT} -C ${_GIT_REPO_PATH} show-ref --tags | ${_GREP} ${_GIT_RESOURCE})
+
+  if [ ! -z "${_TAG_FOUND}" ]; then
 
     return 0
 
