@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Local apache sites-available folder
+_APACHE_SITES_AVAILABLE="/etc/apache2/sites-available"

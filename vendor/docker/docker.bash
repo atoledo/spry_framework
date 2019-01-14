@@ -150,13 +150,59 @@ function docker_exec() {
 
   fi
 
-  shift 2
+  shift 2 && true
+
+  if [ $? -ne 0 ]; then
+
+    raise RequiredParameterNotFound "[docker_exec] Please provide a command to be executed"
+
+  fi
+
   local _SHELL='bash -c '
   local _DOCKER_ARGUMENTS="${@}"
+
   readonly _DOCKER_ARGUMENTS=$(escape_arg "$_DOCKER_ARGUMENTS")
 
-  echo ${_DOCKER} exec -u docker ${_DOCKER_INTERACTIVE} ${_DOCKER_CONTAINER} ${_SHELL}  "$_DOCKER_ARGUMENTS"
-  ${_DOCKER} exec -u docker ${_DOCKER_INTERACTIVE} ${_DOCKER_CONTAINER} ${_SHELL}  "$_DOCKER_ARGUMENTS"
+  ${_DOCKER} exec -u docker ${_DOCKER_INTERACTIVE} ${_DOCKER_CONTAINER} ${_SHELL} "$_DOCKER_ARGUMENTS"
+
+}
+
+function docker_exec_root() {
+
+  if [ -z ${1:-} ]; then
+
+    raise RequiredParameterNotFound "[docker_exec_root] Please provide a container to be exec"
+
+  else
+
+    local _DOCKER_CONTAINER=${1}
+
+  fi
+
+  if [ -z ${2:-} ] || [ ${2:-} == "false" ]; then
+
+    local _DOCKER_INTERACTIVE="-t"
+
+  elif [ ${2:-} == "true" ]; then
+
+    local _DOCKER_INTERACTIVE="-it"
+
+  fi
+
+  shift 2 && true
+
+  if [ $? -ne 0 ]; then
+
+    raise RequiredParameterNotFound "[docker_exec_root] Please provide a command to be executed"
+
+  fi
+
+  local _SHELL='bash -c '
+  local _DOCKER_ARGUMENTS="${@}"
+
+  readonly _DOCKER_ARGUMENTS=$(escape_arg "$_DOCKER_ARGUMENTS")
+
+  ${_DOCKER} exec ${_DOCKER_INTERACTIVE} ${_DOCKER_CONTAINER} ${_SHELL} "$_DOCKER_ARGUMENTS"
 
 }
 

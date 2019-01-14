@@ -9,6 +9,8 @@ function acquia_subsite_mysqldump_no_cache() {
   local _SUB_SITE=${3:-}
   local _DOWNLOADED_DB_FILE=${4:-}
 
+  filesystem_create_folder ${_DOWNLOADED_DB_FILE}
+
   local _SITE_PATH="/var/www/html/${_SUBSCRIPTION}.${_ENVIRONMENT}/docroot/sites/${_SUB_SITE}"
 
   ${_DRUSH} @${_SUBSCRIPTION}.${_ENVIRONMENT} ssh "cd ${_SITE_PATH} \
@@ -37,7 +39,7 @@ function acquia_subsite_mysqldump_no_cache() {
     echo -e "\e[32;1m[ ✔ ] Execute sql dump Schema\e[m"
     ${_MYSQLDUMP} --no-data > ${_SQL_FILE}
 
-    echo -e "\e[32;1m[ ✔ ] Execute sql dump no create Schema\e[m"
+    echo -e "\e[32;1m[ ✔ ] Execute sql dump to create Schema\e[m"
     [ -f ${_TABLES} ] && ${_MYSQLDUMP} --no-create-info --tables $(cat ${_TABLES}) >> ${_SQL_FILE}
 
 
@@ -73,8 +75,9 @@ function acquia_get_info_from_ac() {
   local _ACQUIA_ENVIRONMENT=${2:-}
   local _ACQUIA_COMMAND=${3:-}
   local _ACQUIA_PARAM=${4:-}
+  local _ACQUIA_COMMAND_CONVERTED=$(echo ${_ACQUIA_COMMAND} | sed 's/\W//g')
 
-  local _CACHE_FILE="${_SF_STATIC_CACHE_BASE_FOLDER}/${_TASK_NAME}/${FUNCNAME}/${_ACQUIA_SUBSCRIPTION}_${_ACQUIA_ENVIRONMENT}_${_ACQUIA_COMMAND}_${_ACQUIA_PARAM}.cache"
+  local _CACHE_FILE="${_SF_STATIC_CACHE_BASE_FOLDER}/${_TASK_NAME}/${FUNCNAME}/${_ACQUIA_SUBSCRIPTION}_${_ACQUIA_ENVIRONMENT}_${_ACQUIA_COMMAND_CONVERTED}_${_ACQUIA_PARAM}.cache"
 
   if [ -f ${_CACHE_FILE} ]; then
 
@@ -333,6 +336,31 @@ function acquia_domain_list() {
 
   echo "${_ACQUIA_DOMAIN_LIST}"
 
+}
+
+function acquia_get_subsite_domains_from_env() {
+
+  local _ACQUIA_SUBSCRIPTION=${1:-}
+  local _ACQUIA_ENVIRONMENT=${2:-}
+
+  local _CACHE_FILE="${_SF_STATIC_CACHE_BASE_FOLDER}/${_TASK_NAME}/${FUNCNAME}/${_ACQUIA_SUBSCRIPTION}_${_ACQUIA_ENVIRONMENT}.cache"
+
+  if [ -s "${_CACHE_FILE}" ]; then
+
+    ${_CAT} ${_CACHE_FILE}
+    return 0
+
+  else
+
+    filesystem_create_file ${_CACHE_FILE}
+
+  fi
+
+  local _ACQUIA_SITES_PHP=$(drush_ssh_command ${_ACQUIA_SUBSCRIPTION} ${_ACQUIA_ENVIRONMENT} cd sites "&&" cat sites.php | grep "\$sites\[")
+
+  # Extract only urls and subsites from sites.php, in the format:
+  # url subsite
+  echo "${_ACQUIA_SITES_PHP}" | sed -E "s#[$]sites\['([^']*)'] *= *'([^']*)';#\1 \2#g" | tee ${_CACHE_FILE}
 }
 
 function acquia_code_deploy() {

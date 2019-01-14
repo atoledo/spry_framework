@@ -26,6 +26,34 @@ function drush_command() {
 
 }
 
+function drush_ssh_command() {
+
+  local _DRUSH_SUBSCRIPTION=${1:-}
+  local _DRUSH_ENV=${2:-}
+  shift 2
+  local _DRUSH_COMMAND=${@}
+  local _DRUSH_COMMAND_CONVERTED=$(echo ${_DRUSH_COMMAND} | sed 's/\W//g')
+
+  local _CACHE_FILE="${_SF_STATIC_CACHE_BASE_FOLDER}/${_TASK_NAME}/${FUNCNAME}/${_DRUSH_SUBSCRIPTION}_${_DRUSH_ENV}_${_DRUSH_COMMAND_CONVERTED}.cache"
+
+  if [ -s "${_CACHE_FILE}" ]; then
+
+    ${_CAT} ${_CACHE_FILE}
+    return 0
+
+  else
+
+    filesystem_create_file ${_CACHE_FILE}
+
+  fi
+
+  local _DRUSH_ALIAS="${_DRUSH_SUBSCRIPTION}.${_DRUSH_ENV}"
+  local _DOCROOT_PATH="/var/www/html/${_DRUSH_ALIAS}/docroot"
+
+  ${_DRUSH} @${_DRUSH_ALIAS} ssh --ssh-options="-o ConnectTimeout=5" "cd ${_DOCROOT_PATH} && ${_DRUSH_COMMAND}" | tee ${_CACHE_FILE}
+
+}
+
 function drush_command_on_subsite_from_acquia() {
 
   local _DRUSH_SUBSCRIPTION=${1:-}
@@ -51,7 +79,7 @@ function drush_command_on_subsite_from_acquia() {
   local _DRUSH_ALIAS="${_DRUSH_SUBSCRIPTION}.${_DRUSH_ENV}"
   local _SITES_PATH="/var/www/html/${_DRUSH_ALIAS}/docroot/sites"
 
-  ${_DRUSH} @${_DRUSH_ALIAS} ssh "cd ${_SITES_PATH}/${_DRUSH_SUB_SITE}/ && drush ${_DRUSH_COMMAND}" | tee ${_CACHE_FILE}
+  ${_DRUSH} @${_DRUSH_ALIAS} ssh "[ ! -d \"${_SITES_PATH}/${_DRUSH_SUB_SITE}/\" ] && exit; cd ${_SITES_PATH}/${_DRUSH_SUB_SITE}/ && ${_DRUSH_COMMAND}" | tee ${_CACHE_FILE}
 
 }
 
@@ -150,6 +178,28 @@ function drush_subsite_eval_from_acquia() {
   local _DRUSH_ALIAS="${_DRUSH_SUBSCRIPTION}.${_DRUSH_ENV}"
   local _SITES_PATH="/var/www/html/${_DRUSH_ALIAS}/docroot/sites"
 
-  drush @${_DRUSH_ALIAS} ssh "cd ${_SITES_PATH}/${_DRUSH_SUB_SITE}/ && drush eval \"${_DRUSH_COMMAND}\"" | tee ${_CACHE_FILE}
+  drush @${_DRUSH_ALIAS} ssh "[ ! -d \"${_SITES_PATH}/${_DRUSH_SUB_SITE}/\" ] && exit; cd ${_SITES_PATH}/${_DRUSH_SUB_SITE}/ && drush eval \"${_DRUSH_COMMAND}\"" | tee ${_CACHE_FILE}
+
+}
+
+function drush_get_site_alias() {
+
+  local _DRUSH_SA_PARAMS=${@}
+  local _DRUSH_SA_PARAMS_CONVERTED=$(echo ${_DRUSH_SA_PARAMS} | sed 's/\W//g')
+
+  local _CACHE_FILE="${_SF_STATIC_CACHE_BASE_FOLDER}/${_TASK_NAME}/${FUNCNAME}/${_DRUSH_SA_PARAMS_CONVERTED}.cache"
+
+  if [ -s "${_CACHE_FILE}" ]; then
+
+    ${_CAT} ${_CACHE_FILE}
+    return 0
+
+  else
+
+    filesystem_create_file ${_CACHE_FILE}
+
+  fi
+
+  drush site-alias ${_DRUSH_SA_PARAMS} | tee ${_CACHE_FILE}
 
 }

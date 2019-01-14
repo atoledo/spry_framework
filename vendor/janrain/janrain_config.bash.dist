@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+_JANRAIN_CLIENT_ID=""
+_JANRAIN_CLIENT_SECRET=""
+_JANRAIN_DOMAIN_URL="https://{your-domain}.janraincapture.com"

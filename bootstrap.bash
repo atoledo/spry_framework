@@ -180,6 +180,44 @@ function bootstrap_installer_dependencies() {
 
 }
 
+function bootstrap_copy_configs_from_dist() {
+
+  local _CONFIG_DIST_FILES=${@}
+
+  for _CONFIG_DIST_FILE in ${_CONFIG_DIST_FILES}; do
+
+    local _CONFIG_FILE=$(echo "${_CONFIG_DIST_FILE}" | ${_SED} 's/.*\///' | ${_SED} s/.dist//g)
+    local _CONFIG_EXIST=$(find "${_SPRY_SCRIPT_HOME}" -type f -iname "${_CONFIG_FILE}");
+
+    if [ -z ${_CONFIG_EXIST} ]; then
+
+      _CONFIG_FILE_PATH="${_CONFIG_FOLDER_PATH}/${_CONFIG_FILE}"
+      out_warning "Creating ${_CONFIG_FILE_PATH} from ${_CONFIG_DIST_FILE}."
+      ${_CP} ${_CONFIG_DIST_FILE} ${_CONFIG_FILE_PATH}
+
+    fi
+
+  done
+
+}
+
+function bootstrap_create_configuration_files() {
+
+  local _TASKS_CONFIG_DIST=$(find ${_TASKS_FOLDER_PATH} -type f -iname "*_config.bash.dist");
+  local _MODULES_CONFIG_DIST=$(find ${_MODULES_FOLDER_PATH} -type f -iname "*_config.bash.dist");
+  local _CORE_CONFIG_DIST=$(find ${_VENDOR_FOLDER_PATH} -type f -iname "*_config.bash.dist");
+
+  # tasks
+  bootstrap_copy_configs_from_dist ${_TASKS_CONFIG_DIST}
+
+  # modules
+  bootstrap_copy_configs_from_dist ${_MODULES_CONFIG_DIST}
+
+  # vendor
+  bootstrap_copy_configs_from_dist ${_CORE_CONFIG_DIST}
+
+}
+
 function bootstrap_run() {
 
   # Shift task name parameter

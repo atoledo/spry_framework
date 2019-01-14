@@ -53,9 +53,6 @@ function dns_add_url() {
 
   fi
 
-#dig @172.16.38.219 www-us-mcneil-qa.citdev. A
-#dig @172.16.38.219 www-us-mcneil-qa.citdev. TXT
-
   nsupdate -y "${_DNS_SERVER_KEY}" -v << EOF
 server ${_DNS_SERVER_IP}
 update add ${_DNS_URL}. ${_DNS_TTL} A  ${_SERVER_IP}
@@ -71,7 +68,7 @@ function dns_delete_url() {
   local _DNS_URL=${1:-}
   local _REGEX_URL='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'
   dns_prepare
-  
+
   if [ -z ${_DNS_URL}  ]; then
 
     raise RequiredParameterNotFound "[dns_add_url] Please provide a valid URL"
