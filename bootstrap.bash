@@ -34,6 +34,8 @@ function bootstrap_exit() {
 function bootstrap_core() {
 
   local _LOAD_FILES=$(find "${_SPRY_SCRIPT_HOME}/vendor/core" -type f -iname "*.sh" -o -iname "*.bash");
+
+  [ "${_DEBUG}" == "true" ] && echo "[bootstrap_core] Autoloading core files"
   bootstrap_autoload ${_LOAD_FILES}
 
 }
@@ -48,8 +50,8 @@ function bootstrap_load_tasks() {
   fi
 
   local _LOAD_TASK_PARENT_DIR="$(dirname  ${_LOAD_FILES})"
-  local _LOAD_TASK_DIR="${_TASKS_FOLDER_PATH}/${_TASK_PARENT_NAME}"
   export _TASK_PARENT_NAME="$(basename ${_LOAD_TASK_PARENT_DIR})"
+  local _LOAD_TASK_DIR="${_TASKS_FOLDER_PATH}/${_TASK_PARENT_NAME}"
   if [ -d ${_LOAD_TASK_DIR} ]; then
 
     # Load also any bash files if available inside the task folder
@@ -57,6 +59,7 @@ function bootstrap_load_tasks() {
 
   fi
 
+  [ "${_DEBUG}" == "true" ] && echo "[bootstrap_load_tasks] Autoloading task files"
   bootstrap_autoload ${_LOAD_FILES[@]}
 
 }
@@ -99,6 +102,7 @@ function bootstrap_load_modules() {
     local _LOAD_FILES=$(find ${_FOLDERS[@]} -not \( -path "${_CORE_FOLDER_PATH}" -prune \) -type f -iname "*.bash");
     local _LOADED_MODULE_DEPENDENCIES_BATCH=(${_MODULE_DEPENDENCIES[@]})
 
+    [ "${_DEBUG}" == "true" ] && echo "[bootstrap_load_modules] Autoloading modules files"
     bootstrap_autoload ${_LOAD_FILES}
     if [ ! -z ${_LOADED_MODULE_DEPENDENCIES_BATCH:-} ]; then
 
@@ -108,16 +112,25 @@ function bootstrap_load_modules() {
 
   done
 
+  bootstrap_load_configs
+
+}
+
+function bootstrap_load_configs() {
   # Load config variables from dependencies
   for _MODULE in ${_LOADED_MODULE_DEPENDENCIES[@]}; do
 
     local _CONFIG_PATH="${_CONFIG_FOLDER_PATH}/${_MODULE}_config.bash"
+
+    [ "${_DEBUG}" == "true" ] && echo "[bootstrap_load_modules] Autoloading modules config files"
     bootstrap_autoload ${_CONFIG_PATH}
 
   done
 
   # Load config variables from running task
   local _TASK_CONFIG_PATH="${_CONFIG_FOLDER_PATH}/${_TASK_PARENT_NAME}_config.bash"
+
+  [ "${_DEBUG}" == "true" ] && echo "[bootstrap_load_modules] Autoloading task config files"
   bootstrap_autoload ${_TASK_CONFIG_PATH}
 
 }
@@ -165,6 +178,8 @@ function bootstrap_load_components() {
 
     local _COMPONENT_PATH="$(update_get_component_path ${_COMPONENT})"
     local _COMPONENT_FROM_SRC=$(find ${_COMPONENT_PATH} -regex ".*.dependencies.bash")
+
+    [ "${_DEBUG}" == "true" ] && echo "[bootstrap_load_components] Autoloading dependencies files"
     bootstrap_autoload ${_COMPONENT_FROM_SRC}
 
   done

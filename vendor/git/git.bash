@@ -54,12 +54,12 @@ function git_check_if_resource_exists() {
 
   _GIT_REMOTE_LIST=$(echo ${_GIT_REMOTE_LIST} | sed "s/ /\|/g")
 
-  if (${_GIT} -C ${_GIT_REPO_PATH} tag -l | egrep -q "^\s*((${_GIT_REMOTE_LIST})?/)?${_GIT_RESOURCE}$"); then
+  if (${_GIT} -C ${_GIT_REPO_PATH} tag -l | egrep "^\s*((${_GIT_REMOTE_LIST})?/)?${_GIT_RESOURCE}$" > /dev/null); then
 
     out_success "Tag found"
     return 0
 
-  elif (${_GIT} -C ${_GIT_REPO_PATH} branch -a | egrep -q "^\s*(remotes/)?((${_GIT_REMOTE_LIST})?/)?${_GIT_RESOURCE}$"); then
+  elif (${_GIT} -C ${_GIT_REPO_PATH} branch -a | egrep "^\s*(remotes/)?((${_GIT_REMOTE_LIST})?/)?${_GIT_RESOURCE}$" > /dev/null); then
 
     out_success "Branch found"
     return 0
@@ -107,9 +107,26 @@ function git_is_tag() {
 
   fi
 
-  _TAG_FOUND=$(${_GIT} -C ${_GIT_REPO_PATH} show-ref --tags | ${_GREP} ${_GIT_RESOURCE})
+  _TAG_FOUND=$(${_GIT} -C ${_GIT_REPO_PATH} show-ref --tags | ${_GREP} -E "refs/tags/${_GIT_RESOURCE}$" > /dev/null)
 
   if [ ! -z "${_TAG_FOUND}" ]; then
+
+    return 0
+
+  fi
+
+  return 1
+
+}
+
+function git_is_in_commit() {
+
+  local _GIT_REPO_PATH=${1:-}
+
+  ${_GIT} -C ${_GIT_REPO_PATH} symbolic-ref -q HEAD &> /dev/null && true
+
+  # If symbolic-ref is not found, we are in a commit
+  if [ $? -ne 0 ]; then
 
     return 0
 

@@ -6,7 +6,7 @@ function rest_request() {
   validate_is_empty ${_REST_URL} "api_base_url" "rest_request"
 
   local _REST_API=${2:-}
-  validate_is_empty ${_REST_URL} "api_uri" "rest_request"
+  validate_is_empty ${_REST_API} "api_uri" "rest_request"
 
   local _REST_PARAM=${3:-}
   local _REST_CLIENT_ID=${4:-}
