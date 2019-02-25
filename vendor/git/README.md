@@ -33,3 +33,5 @@ function git_tag ${_GIT_REPO_PATH} ${_GIT_TAG_RESOURCE}
 function git_generate_new_tag_name ${_GIT_REPO_PATH} ${_GIT_ACTIVE_RESOURCE}
 
 function git_fetch ${_GIT_REPO_PATH}
+
+function git_status ${_GIT_REPO_PATH}

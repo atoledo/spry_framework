@@ -725,3 +725,24 @@ function git_fetch() {
   ${_GIT_RUN_IN_REPO} fetch
 
 }
+
+################################################################################
+# @param String _GIT_REPO_PATH - path to destination folder of the clone
+#
+# Performs a git status on target repository
+################################################################################
+function git_status() {
+
+  local _GIT_REPO_PATH=${1:-}
+
+  if [ ! -d ${_GIT_REPO_PATH} ]; then
+
+     raise RequiredParameterNotFound "[git_status] Please provide a valid repository path"
+
+  fi
+
+  local _GIT_RUN_IN_REPO="${_GIT} -C ${_GIT_REPO_PATH}"
+
+  ${_GIT_RUN_IN_REPO} status
+
+}
