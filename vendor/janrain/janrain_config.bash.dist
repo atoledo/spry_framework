@@ -2,4 +2,6 @@
 
 _JANRAIN_CLIENT_ID=""
 _JANRAIN_CLIENT_SECRET=""
-_JANRAIN_DOMAIN_URL="https://{your-domain}.janraincapture.com"
+_JANRAIN_DOMAIN_URL="https://{your-app}.janraincapture.com"
+_JANRAIN_REGIONS="au eu sa sg us"
+_JANRAIN_CAPI_DOMAIN="https://v1.api.us.janrain.com"

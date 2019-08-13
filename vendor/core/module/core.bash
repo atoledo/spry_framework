@@ -246,6 +246,24 @@ function import() {
 
 }
 
+function is_command_installed() {
+
+  local _CORE_COMMAND=${1:-}
+  local _CORE_COMMAND_INSTALLATION=${2:-}
+
+  command -v ${_CORE_COMMAND} > /dev/null && true
+
+  if [ $? -ne 0 ]; then
+
+    raise CommandNotAvailable "[is_command_installed] Command [${_CORE_COMMAND}] is not available/installed. Please install it [${_CORE_COMMAND_INSTALLATION}] and try again."
+    return 1
+
+  fi
+
+  return 0
+
+}
+
 # Check 1 if global command line program installed, else 0
 # example:
 # echo "node: $(program_is_installed node)"

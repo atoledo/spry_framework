@@ -96,7 +96,11 @@ function git_update() {
 
   out_info "Updating repository: [ ${_GIT_REPO_PATH} ]" 1
 
-  if ( ! git_is_current_resource_a_tag ${_GIT_REPO_PATH}); then
+  if (git_is_current_resource_a_tag ${_GIT_REPO_PATH} || git_is_in_commit ${_GIT_REPO_PATH}); then
+
+    out_success "Not in a branch. Skipping git update."
+
+  else
 
     ${_GIT} -C ${_GIT_REPO_PATH} pull
     out_check_status $? "Updated with success" "Update failed at ${_GIT_REPO_PATH}"
@@ -189,27 +193,32 @@ function git_reset_repository() {
 
   fi
 
-  out_info "Reseting repository [ ${_GIT_REPO_PATH} ]" 1
+  out_info "Resetting repository [ ${_GIT_REPO_PATH} ]" 1
   local _GIT_ACTIVE_RESOURCE="$(git_get_current_resource ${_GIT_REPO_PATH})"
 
-  if [ ! -z ${_GIT_ACTIVE_RESOURCE} ]; then
+  if [ ! -z "${_GIT_ACTIVE_RESOURCE}" ]; then
 
     if (git_is_tag ${_GIT_REPO_PATH} ${_GIT_ACTIVE_RESOURCE}); then
 
       ${_GIT} -C ${_GIT_REPO_PATH} reset --hard ${_GIT_ACTIVE_RESOURCE}
-      out_check_status $? "Reseting tag with success" "Fail on reset tag ${_GIT_ACTIVE_RESOURCE}"
+      out_check_status $? "Resetting tag with success" "Fail on reset tag ${_GIT_ACTIVE_RESOURCE}"
+
+    elif (git_is_in_commit ${_GIT_REPO_PATH}); then
+
+      ${_GIT} -C ${_GIT_REPO_PATH} reset --hard ${_GIT_ACTIVE_RESOURCE}
+      out_check_status $? "Resetting commit with success" "Fail on reset commit ${_GIT_ACTIVE_RESOURCE}"
 
     else
 
       ${_GIT} -C ${_GIT_REPO_PATH} reset --hard origin/${_GIT_ACTIVE_RESOURCE}
-      out_check_status $? "Reseting origin/${_GIT_ACTIVE_RESOURCE} with success" "Fail on reset repository ${_GIT_ACTIVE_RESOURCE}"
+      out_check_status $? "Resetting origin/${_GIT_ACTIVE_RESOURCE} with success" "Fail on reset repository ${_GIT_ACTIVE_RESOURCE}"
 
     fi
 
   else
 
     ${_GIT} -C ${_GIT_REPO_PATH} reset --hard HEAD
-    out_check_status $? "Reseting with success" "Fail on reset repository ${_GIT_ACTIVE_RESOURCE}"
+    out_check_status $? "Resetting with success" "Fail on reset repository ${_GIT_ACTIVE_RESOURCE}"
 
   fi
 
@@ -508,7 +517,7 @@ function git_is_current_resource_a_tag() {
 
   fi
 
-  local _GIT_ACTIVE_RESOURCE="$(${_GIT} -C ${_GIT_REPO_PATH} symbolic-ref -q --short HEAD || ${_GIT} -C ${_GIT_REPO_PATH} describe --tags --exact-match)"
+  local _GIT_ACTIVE_RESOURCE=$(${_GIT} -C ${_GIT_REPO_PATH} symbolic-ref --short HEAD 2> /dev/null || ${_GIT} -C ${_GIT_REPO_PATH} describe --tags --exact-match 2> /dev/null)
 
 	if [ ! -z ${_GIT_ACTIVE_RESOURCE} ]; then
 
@@ -539,7 +548,7 @@ function git_clean_to_head() {
 
   fi
 
-  out_info "Reseting repository to the last commit." 1
+  out_info "Resetting repository to the last commit." 1
   ${_GIT} -C ${_GIT_REPO_PATH} reset --hard HEAD
   git_clean_repository ${_GIT_REPO_PATH}
 
@@ -560,8 +569,15 @@ function git_get_current_resource() {
 
   fi
 
-  local _GIT_ACTIVE_RESOURCE="$(${_GIT} -C ${_GIT_REPO_PATH} symbolic-ref -q --short HEAD || ${_GIT} -C ${_GIT_REPO_PATH} describe --tags --exact-match)"
-  if [ -z ${_GIT_ACTIVE_RESOURCE} ]; then
+  local _GIT_ACTIVE_RESOURCE=$(${_GIT} -C ${_GIT_REPO_PATH} symbolic-ref --short HEAD 2> /dev/null || ${_GIT} -C ${_GIT_REPO_PATH} describe --tags --exact-match 2> /dev/null)
+
+  if [ -z "${_GIT_ACTIVE_RESOURCE}" ]; then
+
+    _GIT_ACTIVE_RESOURCE=$(${_GIT} -C ${_GIT_REPO_PATH} rev-parse --short HEAD)
+
+  fi
+
+  if [ -z "${_GIT_ACTIVE_RESOURCE}" ]; then
 
     raise FolderNotFound "[git_get_current_resource] ${_GIT_ACTIVE_RESOURCE} resource not found."
 
@@ -686,5 +702,47 @@ function git_rebase() {
 
   return 0;
 
+
+}
+
+################################################################################
+# @param String _GIT_REPO_PATH - path to destination folder of the clone
+#
+# Performs a git fetch on target repository
+################################################################################
+function git_fetch() {
+
+  local _GIT_REPO_PATH=${1:-}
+
+  if [ ! -d ${_GIT_REPO_PATH} ]; then
+
+     raise RequiredParameterNotFound "[git_rebase] Please provide a valid repository path"
+
+  fi
+
+  local _GIT_RUN_IN_REPO="${_GIT} -C ${_GIT_REPO_PATH}"
+
+  ${_GIT_RUN_IN_REPO} fetch
+
+}
+
+################################################################################
+# @param String _GIT_REPO_PATH - path to destination folder of the clone
+#
+# Performs a git status on target repository
+################################################################################
+function git_status() {
+
+  local _GIT_REPO_PATH=${1:-}
+
+  if [ ! -d ${_GIT_REPO_PATH} ]; then
+
+     raise RequiredParameterNotFound "[git_status] Please provide a valid repository path"
+
+  fi
+
+  local _GIT_RUN_IN_REPO="${_GIT} -C ${_GIT_REPO_PATH}"
+
+  ${_GIT_RUN_IN_REPO} status
 
 }

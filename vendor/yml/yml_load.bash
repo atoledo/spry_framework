@@ -39,7 +39,7 @@ function yml_parse() {
 
   local _YML=$(yml "$@")
 
-  while echo -e "${_YML}" | grep -Eq "[a-zA-Z0-9_]*-[a-zA-Z0-9_]*="; do
+  while echo -e "${_YML}" | grep -E "[a-zA-Z0-9_]*-[a-zA-Z0-9_]*=" > /dev/null; do
 
     _YML=$(echo -e "${_YML}" | sed -r "s/^([a-zA-Z0-9_]*)-([a-zA-Z0-9_]*)/\1_\2/g")
 

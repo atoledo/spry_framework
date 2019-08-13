@@ -44,7 +44,7 @@ function rest_get() {
 
   local _REST_PARAM="-s -X GET"
 
-  rest_request ${_REST_URL} ${_REST_API} "${_REST_PARAM}" ${_REST_CLIENT_ID} ${_REST_CLIENT_KEY}
+  rest_request ${_REST_URL} ${_REST_API} "${_REST_PARAM}" "${_REST_CLIENT_ID}" "${_REST_CLIENT_KEY}" "${_REST_HEADER}"
 
 }
 
