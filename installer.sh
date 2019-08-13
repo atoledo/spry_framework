@@ -29,7 +29,6 @@ fi
 
 [ -f "${_SPRY_SCRIPT_HOME}/.env" ] && source "${_SPRY_SCRIPT_HOME}/.env"
 source "${_SPRY_SCRIPT_HOME}/bootstrap.bash"
-readonly _SF_SCRIPTS_CONFIG="${_SPRY_SCRIPT_HOME}/config"
 readonly _TASK_NAME="installer"
 
 bootstrap_core

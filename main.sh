@@ -31,7 +31,6 @@ if [ ${#} -ge 1 ]; then
 
   [ -f "${_SPRY_SCRIPT_HOME}/.env" ] && source "${_SPRY_SCRIPT_HOME}/.env"
   source "${_SPRY_SCRIPT_HOME}/bootstrap.bash"
-  readonly _SF_SCRIPTS_CONFIG="${_SPRY_SCRIPT_HOME}/config"
   readonly _TASK_NAME=${1}
   export _TASK_PARENT_NAME=""
   bootstrap_core

@@ -222,6 +222,8 @@ function bootstrap_create_configuration_files() {
   local _MODULES_CONFIG_DIST=$(find ${_MODULES_FOLDER_PATH} -type f -iname "*_config.bash.dist");
   local _CORE_CONFIG_DIST=$(find ${_VENDOR_FOLDER_PATH} -type f -iname "*_config.bash.dist");
 
+  filesystem_create_folder ${_CONFIG_FOLDER_PATH}
+
   # tasks
   bootstrap_copy_configs_from_dist ${_TASKS_CONFIG_DIST}
 
